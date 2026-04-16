@@ -1,0 +1,406 @@
+Console output saved to: ../Results/logs/QSPR_Analysis_20260310_185447.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+                    SINGLE RUN – PRE-SELECTED FEATURES (6)                    
+════════════════════════════════════════════════════════════════════════════════
+
+
+═══════════════════════════════════════════════════════════════════════════
+         ADVANCED QSPR ANALYSIS - COMPLETE PIPELINE (REGRESSION)         
+═══════════════════════════════════════════════════════════════════════════
+
+███████████████████████████████████████████████████████████████████████████
+              STEP 1: DATA LOADING & DESCRIPTOR CALCULATION              
+███████████████████████████████████████████████████████████████████████████
+
+Loading data from: ../Data/model_III_thia_Michael.xlsx
+Including CircuS descriptors: True
+Including ChyLine descriptors: True
+
+===========================================================================
+LOADING DATA FOR UNIFIED DESCRIPTOR CALCULATION
+===========================================================================
+  DESCRIPTOR PIPELINE:
+ Mordred: True
+ Morgan FP: True
+ Sterimol + Electronic: True
+ ChemBERTa: False
+ CircuS: True
+ ChyLine: True
+
+---------------------------------------------------------------------------
+Calculating/Cleaning descriptors ...
+---------------------------------------------------------------------------
+SUCCESS: Loaded CLEANED descriptors from ..\Data\molecular_descriptors_cleaned_models_.parquet
+Shape: (63, 4087)
+Internal split: train=53, test=10
+Returning: train_df, test_df
+
+OK: Data loaded: 63 samples × 4087 features
+  Descriptor breakdown:
+    - Mordred: ~1600+ 2D/3D descriptors
+    - Morgan FP: 2048-bit (radius=2)
+    - Sterimol: L, B1, B5 parameters
+    - Electronic: Electronegativity, Partial Charges, Polarity Diffs
+    - ChemBERTa: 384-dim pretrained embeddings
+    - CircuS: Fragment-count descriptors
+    - ChyLine: Linear fragment-count descriptors
+
+ Target range: [0.0, 99.0]
+ Target std: 31.62
+ Target mean: 64.85
+
+███████████████████████████████████████████████████████████████████████████
+               PRESELECTED FEATURES MODE - SKIPPING STEP 2               
+███████████████████████████████████████████████████████████████████████████
+→ Using 6 pre-selected features (Step 2 skipped).
+
+===========================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                   FEATURE CORRELATIONS WITH TARGET ee                   
+███████████████████████████████████████████████████████████████████████████
+
+Analysis on: TRAINING DATASET (53 structures)
+Method: Pearson correlation coefficient
+
+Feature                                   Correlation         p-value
+----------------------------------------------------------------------
+IC1                                           -0.5664        9.85e-06
+PEOE_VSA6                                      0.5623        1.18e-05
+CIC1                                           0.4887        2.05e-04
+GATS6are                                       0.3611        7.90e-03
+SdssC                                          0.2656        5.46e-02
+GATS4d                                        -0.2514        6.94e-02
+
+======================================================================
+Strong correlations (|r| > 0.5): 2
+Moderate correlations (0.3 < |r| ≤ 0.5): 2
+Weak correlations (0.1 < |r| ≤ 0.3): 2
+Negligible correlations (|r| ≤ 0.1): 0
+======================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                    STEP 3: BASELINE MODEL COMPARISONS                   
+███████████████████████████████████████████████████████████████████████████
+
+[Data Saved] Training data -> ..\Results\Selected_Data\RS42_preselected_n6_preselected_False_train_data.parquet
+[Data Saved] Test data     -> ..\Results\Selected_Data\RS42_preselected_n6_preselected_False_test_data.parquet
+
+Using SELECTED FEATURES only:
+├─ Training set shape: (53, 4087)
+├─ Test set shape: (10, 4087)
+└─ Number of features: (53, 4087)
+
+Note: Features were selected from training data ONLY (Step 2)
+      Test data was NOT used for feature selection
+
+1. Dummy Mean Predictor (predicts training mean):
+   RMSE: 31.26
+   R²: -0.0099
+
+███████████████████████████████████████████████████████████████████████████
+            STEP 4: HYPERPARAMETER OPTIMIZATION (GRIDSEARCHCV)           
+███████████████████████████████████████████████████████████████████████████
+
+1.  Optimizing Random Forest hyperparameters...
+
+======================================================================
+  Algorithm hyperparameters: RANDOM_FOREST
+======================================================================
+   Testing n_estimators: [50, 100, 200, 300]
+   Testing max_features: ['sqrt', None]
+   Testing max_samples: [None, 0.5, 0.8, 0.9]
+   Testing bootstrap: [True]
+   Testing max_depth: [2, 3, 4, 5, 6]
+   Testing min_samples_split: [2, 3, 4, 5]
+   Testing min_samples_leaf: [2, 3, 4, 5]
+======================================================================
+
+    Best n_estimators: 200
+    Best max_depth: 5
+    Best max_features: sqrt
+    Best bootstrap: True
+    Best min_samples_split: 2
+    Best min_samples_leaf: 2
+    CV RMSE: 23.1005
+    Combinations tested: 2560
+
+2.  Optimizing XGBoost hyperparameters...
+
+======================================================================
+  Algorithm hyperparameters: XGBOOST
+======================================================================
+   Testing n_estimators: [20, 30, 40, 50, 75, 100]
+   Testing colsample_bytree: [0.8, 1.0]
+   Testing learning_rate: [0.05, 0.1]
+   Testing max_depth: [1, 2, 3, 4]
+   Testing subsample: [0.6, 0.7, 0.8, 0.9, 1.0]
+   Testing reg_alpha: [0.1, 1, 10]
+   Testing reg_lambda: [1, 5, 10]
+   Testing min_child_weight: [1, 3, 5]
+======================================================================
+
+    Best n_estimators: 50
+    Best learning_rate: 0.1
+    Best colsample_bytree: 0.8
+    Best max_depth: 1
+    Best subsample: 0.6
+    Best reg_alpha: 0.1
+    Best reg_lambda: 1
+    Best min_child_weight: 3
+    CV RMSE: 23.6254
+    Combinations tested: 12960
+
+3.  Optimizing Gradient Boosting hyperparameters...
+
+======================================================================
+  Algorithm hyperparameters: GRADIENT_BOOSTING
+======================================================================
+   Testing n_estimators: [20, 30, 40, 50, 75, 100]
+   Testing learning_rate: [0.05, 0.1]
+   Testing max_depth: [1, 2, 3, 4]
+   Testing subsample: [0.7, 0.8, 0.9, 1.0]
+   Testing max_features: ['sqrt', None]
+   Testing min_samples_split: [2, 5, 8]
+   Testing min_samples_leaf: [2, 3, 4, 5]
+======================================================================
+
+    Best n_estimators: 20
+    Best learning_rate: 0.1
+    Best max_depth: 4
+    Best subsample: 0.8
+    Best max_features: sqrt
+    Best min_samples_split: 5
+    Best min_samples_leaf: 2
+    CV RMSE: 22.5454
+    Combinations tested: 4608
+
+4.  Optimizing Ridge Regression (Multiple Linear Regression)...
+
+======================================================================
+  Algorithm hyperparameters: RIDGE_REGRESSION
+======================================================================
+   Testing alpha: [0.01, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100, 150, 200]
+   Testing solver: ['auto']
+   Testing fit_intercept: [True, False]
+======================================================================
+
+    Best alpha: 10
+    Best solver: auto
+    Fit intercept: True
+    CV RMSE: 23.6606
+    Combinations tested: 24
+
+5.  Optimizing Decision Tree Regressor...
+
+======================================================================
+  Algorithm hyperparameters: DECISION_TREE
+======================================================================
+   Testing max_depth: [2, 3, 4, 5, 6]
+   Testing min_samples_split: [3, 5, 8]
+   Testing min_samples_leaf: [3, 4, 6]
+   Testing criterion: ['squared_error', 'friedman_mse', 'absolute_error']
+   Testing splitter: ['best']
+   Testing max_features: ['sqrt', None, 0.5]
+   Testing ccp_alpha: [0.0, 0.005, 0.01, 0.02, 0.04, 0.08]
+======================================================================
+
+    Best max_depth: 4
+    Best min_samples_split: 3
+    Best criterion: squared_error
+    Best splitter: best
+    Best max_features: 0.5
+    CV RMSE: 22.5235
+    Combinations tested: 2430
+
+6.  Optimizing K-Nearest Neighbors Regressor...
+
+======================================================================
+  Algorithm hyperparameters: KNN
+======================================================================
+   Testing n_neighbors: [3, 5, 7, 9, 11]
+   Testing weights: ['uniform']
+   Testing algorithm: ['auto', 'ball_tree']
+   Testing p: [1, 1.5, 2, 3, inf]
+   Testing metric: ['minkowski', 'chebyshev']
+======================================================================
+
+    Best n_neighbors: 11
+    Best weights: uniform
+    Best algorithm: auto
+    Best metric: minkowski
+    CV RMSE: 22.5674
+    Combinations tested: 100
+
+7.  Optimizing Support Vector Regressor...
+
+======================================================================
+  Algorithm hyperparameters: SVM
+======================================================================
+   Testing C: [0.001, 0.01, 0.1, 0.5, 1, 2, 5, 10, 15, 20]
+   Testing kernel: ['linear', 'rbf']
+   Testing gamma: ['scale', 'auto', 0.001, 0.01, 0.1]
+   Testing epsilon: [0.001, 0.01, 0.1, 0.2, 0.3, 0.5]
+======================================================================
+
+    Best C: 20
+    Best kernel: rbf
+    Best gamma: 0.1
+    Best epsilon: 0.001
+    CV RMSE: 21.9357
+    Combinations tested: 600
+
+███████████████████████████████████████████████████████████████████████████
+                      STEP 5: TRAINING ML ALGORITHMS                     
+███████████████████████████████████████████████████████████████████████████
+
+[Pre-computation] Calculating Area of Applicability (AOA)...
+ High-res PDF saved as 'applicability_domain_highres_'preselected_COMMON_6_preselected_False'_.pdf'
+OK: AOA calculated and saved (will be reused for all models).
+
+1. Training RandomForestRegressor...
+   Running Target Shuffling (Validation) for RandomForestRegressor (preselected)...
+      PASS: Model significantly better than noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_RandomForestRegressor_model.pkl
+  Train RMSE: 13.78 (R²=0.81, Train MAE: 10.15)
+  Test RMSE:  21.12 (R²=0.54, Test MAE: 18.42)
+  CV RMSE:    23.10 ± 5.00
+  CV MAE:     17.56±3.60
+  RMSE/MAE ratio:     1.15
+  Null RMSE:  32.81 ± 4.06 (Target Shuffling Baseline)
+  Threshold:  < 24.69 (Required for True Significance)
+  Target shuffling minimal RMSE: 21.11; maximal RMSE: 47.28
+  Z-score (How many sigmas is our model away from noise mean?): 2.88 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=1.98e-02)
+
+2. Training XGBoost...
+   Running Target Shuffling (Validation) for XGBoost (preselected)...
+      PASS: Model significantly better than noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_XGBoost_model.pkl
+  Train RMSE: 16.72 (R²=0.72, Train MAE: 13.13)
+  Test RMSE:  23.82 (R²=0.41, Test MAE: 19.69)
+  CV RMSE:    23.85 ± 5.68
+  CV MAE:     18.68±5.46
+  RMSE/MAE ratio:     1.21
+  Null RMSE:  33.05 ± 3.98 (Target Shuffling Baseline)
+  Threshold:  < 25.09 (Required for True Significance)
+  Target shuffling minimal RMSE: 19.92; maximal RMSE: 39.83
+  Z-score (How many sigmas is our model away from noise mean?): 2.32 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=3.96e-02)
+
+3. Training GradientBoosting...
+   Running Target Shuffling (Validation) for GradientBoosting (preselected)...
+      PASS: Model significantly better than noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_GradientBoosting_model.pkl
+  Train RMSE: 10.54 (R²=0.89, Train MAE: 8.33)
+  Test RMSE:  20.28 (R²=0.57, Test MAE: 17.05)
+  CV RMSE:    22.55 ± 4.94
+  CV MAE:     17.60±3.81
+  RMSE/MAE ratio:     1.19
+  Null RMSE:  34.48 ± 4.83 (Target Shuffling Baseline)
+  Threshold:  < 24.82 (Required for True Significance)
+  Target shuffling minimal RMSE: 23.50; maximal RMSE: 46.17
+  Z-score (How many sigmas is our model away from noise mean?): 2.94 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+4. Training Ridge...
+   Running Target Shuffling (Validation) for Ridge (preselected)...
+      PASS: Model significantly better than noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_Ridge_model.pkl
+  Train RMSE: 21.94 (R²=0.51, Train MAE: 17.70)
+  Test RMSE:  22.04 (R²=0.50, Test MAE: 18.06)
+  CV RMSE:    23.66 ± 5.51
+  CV MAE:     19.72±3.89
+  RMSE/MAE ratio:     1.22
+  Null RMSE:  32.01 ± 3.88 (Target Shuffling Baseline)
+  Threshold:  < 24.24 (Required for True Significance)
+  Target shuffling minimal RMSE: 24.51; maximal RMSE: 42.04
+  Z-score (How many sigmas is our model away from noise mean?): 2.57 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+5. Training DecisionTree...
+   Running Target Shuffling (Validation) for DecisionTree (preselected)...
+      WARNING: Model indistinguishable from noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_DecisionTree_model.pkl
+  Train RMSE: 14.82 (R²=0.78, Train MAE: 10.39)
+  Test RMSE:  26.35 (R²=0.28, Test MAE: 18.38)
+  CV RMSE:    22.52 ± 7.66
+  CV MAE:     16.43±4.96
+  RMSE/MAE ratio:     1.43
+  Null RMSE:  37.26 ± 6.43 (Target Shuffling Baseline)
+  Threshold:  < 24.41 (Required for True Significance)
+  Target shuffling minimal RMSE: 19.76; maximal RMSE: 52.86
+  Z-score (How many sigmas is our model away from noise mean?): 1.70 (FAIL)
+  Status:      Significant (p=4.95e-02)
+
+6. Training KNN...
+   Running Target Shuffling (Validation) for KNN (preselected)...
+      PASS: Model significantly better than noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_KNN_model.pkl
+  Train RMSE: 23.40 (R²=0.44, Train MAE: 17.45)
+  Test RMSE:  23.97 (R²=0.41, Test MAE: 19.13)
+  CV RMSE:    22.57 ± 5.14
+  CV MAE:     17.16±3.94
+  RMSE/MAE ratio:     1.25
+  Null RMSE:  33.09 ± 3.43 (Target Shuffling Baseline)
+  Threshold:  < 26.24 (Required for True Significance)
+  Target shuffling minimal RMSE: 24.92; maximal RMSE: 42.70
+  Z-score (How many sigmas is our model away from noise mean?): 2.66 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+7. Training SVR...
+   Running Target Shuffling (Validation) for SVR (preselected)...
+      PASS: Model significantly better than noise.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_SVR_model.pkl
+  Train RMSE: 19.87 (R²=0.60, Train MAE: 13.00)
+  Test RMSE:  22.62 (R²=0.47, Test MAE: 18.17)
+  CV RMSE:    21.94 ± 5.68
+  CV MAE:     16.73±4.60
+  RMSE/MAE ratio:     1.24
+  Null RMSE:  34.45 ± 3.79 (Target Shuffling Baseline)
+  Threshold:  < 26.87 (Required for True Significance)
+  Target shuffling minimal RMSE: 24.46; maximal RMSE: 45.46
+  Z-score (How many sigmas is our model away from noise mean?): 3.12 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+███████████████████████████████████████████████████████████████████████████
+                  STEP 6: RESULTS COMPILATION & ANALYSIS                 
+███████████████████████████████████████████████████████████████████████████
+
+TOP 3 MODELS (Ranked by Test RMSE):
+-----------------------------------------------------------------------------------------------
+Algorithm                 | RMSE     | R2     | p-value    | Status
+-----------------------------------------------------------------------------------------------
+GradientBoosting          | 20.284    | 0.57   | 9.9e-03  | High Significance
+RandomForestRegressor     | 21.117    | 0.54   | 2.0e-02  | High Significance
+Ridge                     | 22.044    | 0.50   | 9.9e-03  | High Significance
+
+BASELINE COMPARISON:
+----------------------------------------------------------------------
+Dummy Mean RMSE:  31.26
+Best Model RMSE:  20.28
+Improvement:      35.1%
+
+███████████████████████████████████████████████████████████████████████████
+            STEP 7: UNCERTAINTY QUANTIFICATION & AOA ANALYSIS            
+███████████████████████████████████████████████████████████████████████████
+
+Winning Algorithm: GradientBoosting
+----------------------------------------
+
+Bootstrap Uncertainty (95% CI on Predictions):
+Sample predictions for first 3 test molecules:
+  Mol 1: True=94.0 | Pred=86.1 (95% CI: 74.6 - 90.7, Width: 16.1)
+  Mol 2: True=96.0 | Pred=82.8 (95% CI: 66.6 - 91.8, Width: 25.1)
+  Mol 3: True=40.0 | Pred=64.1 (95% CI: 42.6 - 84.7, Width: 42.0)
+
+Area of Applicability (AOA) Status:
+  Interpolative (Reliable):  90.0% of test set
+  Extrapolative (Uncertain): 10.0% of test set
+  (See generated PDF file for visual plot)
+
+OK: Results exported to ../Results/QSPR_Preselected_20260310_185447.xlsx
+
+Saved → ../Results/QSPR_Preselected_20260310_185447.xlsx

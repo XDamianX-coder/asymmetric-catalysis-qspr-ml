@@ -1,0 +1,30 @@
+# config.yaml
+data:
+  file: "../Data/QSPR_epoxidation_ee.xlsx"
+  target_col: "epox_cla"
+  smiles_col: "SMILES"
+
+descriptors:
+  mordred: true
+  morgan_fp: true
+  sterimol_electronic: true
+  chemberta: true
+  circus:
+    enabled: true
+    lower_radius: 1
+    upper_radius: 3
+  chyline:
+    enabled: true
+    lower_length: 2
+    upper_length: 4
+
+paths:
+  descriptors: "../Data"
+  results: "../Results"
+  models: "../Results/Trained_Models"
+  logs: "../Results/logs"
+
+filters:
+  nan_threshold: 0.2
+  variance_threshold: 0.01
+  correlation_threshold: 0.95
