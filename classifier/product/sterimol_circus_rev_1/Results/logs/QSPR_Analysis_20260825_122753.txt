@@ -1,0 +1,292 @@
+Console output saved to: ../Results/logs/QSPR_Analysis_20260825_122753.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+                    SINGLE RUN – PRE-SELECTED FEATURES (6)                    
+════════════════════════════════════════════════════════════════════════════════
+
+
+Loaded historical frozen classification pipelines; GridSearchCV was skipped.
+
+═══════════════════════════════════════════════════════════════════════════
+                ADVANCED QSPR ANALYSIS - COMPLETE PIPELINE               
+═══════════════════════════════════════════════════════════════════════════
+
+███████████████████████████████████████████████████████████████████████████
+              STEP 1: DATA LOADING & DESCRIPTOR CALCULATION              
+███████████████████████████████████████████████████████████████████████████
+
+Loading data from: ../Data/QSPR_epoxidation_ee.xlsx
+Including CircuS descriptors: True
+Including ChyLine descriptors: False
+
+===========================================================================
+LOADING DATA FOR UNIFIED DESCRIPTOR CALCULATION
+===========================================================================
+  DESCRIPTOR PIPELINE:
+ Mordred: False
+ Morgan FP: False
+ Sterimol + Electronic: True
+ ChemBERTa: False
+ CircuS: True
+ ChyLine: False
+
+---------------------------------------------------------------------------
+Calculating/Cleaning descriptors ...
+---------------------------------------------------------------------------
+SUCCESS: Loaded CLEANED descriptors from ..\Data\molecular_descriptors_cleaned_models_.parquet
+Shape: (67, 551)
+Internal split: train=56, test=11
+Returning: train_df, test_df
+
+OK: Data loaded: 67 samples × 551 features
+  Descriptor breakdown:
+    - Mordred: ~1600+ 2D/3D descriptors
+    - Morgan FP: 2048-bit (radius=2)
+    - Sterimol: L, B1, B5 parameters
+    - Electronic: Electronegativity, Partial Charges, Polarity Diffs
+    - ChemBERTa: 384-dim pretrained embeddings
+    - CircuS: Fragment-count descriptors
+
+ Target range: [0.0, 1.0]
+ Target std: 0.49
+ Target mean: 0.63
+
+███████████████████████████████████████████████████████████████████████████
+               PRESELECTED FEATURES MODE - SKIPPING STEP 2               
+███████████████████████████████████████████████████████████████████████████
+→ Using 6 pre-selected features directly (bypassing consensus).
+
+===========================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                FEATURE CORRELATIONS WITH TARGET epox_cla                
+███████████████████████████████████████████████████████████████████████████
+
+Analysis on: TRAINING DATASET (56 structures)
+Method: Pearson correlation coefficient
+
+Feature                                   Correlation         p-value
+----------------------------------------------------------------------
+CircuS_r1-3_C[C@@H]1O[C@H]1C(=O)C              0.4519        4.71e-04
+CircuS_r1-3_ccc                                0.4439        6.10e-04
+CircuS_r1-3_[C@@H]1([C@H](C)O1)C               0.4082        1.79e-03
+CircuS_r1-3_O1[C@@H](C)C1                      0.2942        2.78e-02
+Sterimol_Beta_R2_B5                           -0.1366        3.15e-01
+Sterimol_Alpha_R1_L                            0.0155        9.10e-01
+
+======================================================================
+Strong correlations (|r| > 0.5): 0
+Moderate correlations (0.3 < |r| ≤ 0.5): 3
+Weak correlations (0.1 < |r| ≤ 0.3): 2
+Negligible correlations (|r| ≤ 0.1): 1
+======================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                    STEP 3: BASELINE MODEL COMPARISONS                   
+███████████████████████████████████████████████████████████████████████████
+
+[Data Saved] Training data -> ..\Results\Selected_Data\RS42_preselected_n6_preselected_False_train_data.parquet
+[Data Saved] Test data     -> ..\Results\Selected_Data\RS42_preselected_n6_preselected_False_test_data.parquet
+
+Using SELECTED FEATURES only:
+├─ Training set shape: (56, 551)
+├─ Test set shape: (11, 551)
+└─ Number of features: (56, 551)
+
+Note: Features were selected from training data ONLY (Step 2)
+      Test data was NOT used for feature selection
+
+1. Dummy Majority-Class Predictor
+ Accuracy: 0.64
+ F1-score: 0.39
+ Balanced Acc: 0.50
+ (Predicts majority class of training target for all samples)
+
+███████████████████████████████████████████████████████████████████████████
+█                     STEP 5: TRAINING ML CLASSIFIERS                     █
+███████████████████████████████████████████████████████████████████████████
+
+[Pre-computation] Calculating Area of Applicability (AOA)...
+ High-res PDF saved as 'applicability_domain_highres_'preselected_COMMON_6_preselected_False'_.pdf'
+OK: AOA calculated and saved (will be reused for all models).
+
+1. Training RandomForest...
+   Running Target Shuffling (Validation) for RandomForest (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_RandomForest_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_RandomForest_fine-tuned_model.pkl
+ Train Accuracy: 0.804
+ Train Balanced Acc:  0.795
+ Train F1-score:   0.792
+------------------------------
+ Test Accuracy: 0.455
+ Test Balanced Acc:   0.464
+ Test F1-score:  0.450
+ CV Accuracy:    0.752 ± 0.082
+ CV Balanced Acc:     0.756 ± 0.072
+   Null Balanced Accuracy:  0.49 ± 0.11 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.68 (To beat 95% of random models)
+   Status:      Not Significant (p=6.14e-01)
+  Target shuffling minimal Balanced accuracy: 0.27; maximal balanced accuracy: 0.86
+  Z-score (How many sigmas is our model away from noise mean?): -0.19 (FAIL)
+
+2. Training XGBoost...
+   Running Target Shuffling (Validation) for XGBoost (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_XGBoost_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_XGBoost_fine-tuned_model.pkl
+ Train Accuracy: 0.804
+ Train Balanced Acc:  0.795
+ Train F1-score:   0.792
+------------------------------
+ Test Accuracy: 0.636
+ Test Balanced Acc:   0.714
+ Test F1-score:  0.633
+ CV Accuracy:    0.821 ± 0.115
+ CV Balanced Acc:     0.814 ± 0.108
+   Null Balanced Accuracy:  0.52 ± 0.13 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.72 (To beat 95% of random models)
+   Status:      Borderline (Good signal, but high variance) (p=1.19e-01)
+  Target shuffling minimal Balanced accuracy: 0.29; maximal balanced accuracy: 0.79
+  Z-score (How many sigmas is our model away from noise mean?): 1.55 (FAIL)
+
+3. Training GradientBoosting...
+   Running Target Shuffling (Validation) for GradientBoosting (preselected)...
+      PASS: Model significantly better than noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_GradientBoosting_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_GradientBoosting_fine-tuned_model.pkl
+ Train Accuracy: 0.875
+ Train Balanced Acc:  0.871
+ Train F1-score:   0.868
+------------------------------
+ Test Accuracy: 0.818
+ Test Balanced Acc:   0.804
+ Test F1-score:  0.804
+ CV Accuracy:    0.750 ± 0.089
+ CV Balanced Acc:     0.735 ± 0.085
+   Null Balanced Accuracy:  0.49 ± 0.13 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.68 (To beat 95% of random models)
+   Status:      Significant (Better than random) (p=2.97e-02)
+  Target shuffling minimal Balanced accuracy: 0.21; maximal balanced accuracy: 0.80
+  Z-score (How many sigmas is our model away from noise mean?): 2.45 (PASS: >2σ)
+
+4. Training LogisticRegression...
+   Running Target Shuffling (Validation) for LogisticRegression (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_LogisticRegression_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_LogisticRegression_fine-tuned_model.pkl
+ Train Accuracy: 0.804
+ Train Balanced Acc:  0.786
+ Train F1-score:   0.788
+------------------------------
+ Test Accuracy: 0.545
+ Test Balanced Acc:   0.589
+ Test F1-score:  0.545
+ CV Accuracy:    0.752 ± 0.141
+ CV Balanced Acc:     0.734 ± 0.152
+   Null Balanced Accuracy:  0.48 ± 0.11 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.66 (To beat 95% of random models)
+   Status:      Not Significant (p=2.67e-01)
+  Target shuffling minimal Balanced accuracy: 0.29; maximal balanced accuracy: 0.79
+  Z-score (How many sigmas is our model away from noise mean?): 0.96 (FAIL)
+
+5. Training DecisionTree...
+   Running Target Shuffling (Validation) for DecisionTree (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_DecisionTree_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_DecisionTree_fine-tuned_model.pkl
+ Train Accuracy: 0.804
+ Train Balanced Acc:  0.795
+ Train F1-score:   0.792
+------------------------------
+ Test Accuracy: 0.636
+ Test Balanced Acc:   0.714
+ Test F1-score:  0.633
+ CV Accuracy:    0.805 ± 0.118
+ CV Balanced Acc:     0.799 ± 0.114
+   Null Balanced Accuracy:  0.50 ± 0.14 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.71 (To beat 95% of random models)
+   Status:      Borderline (Good signal, but high variance) (p=7.92e-02)
+  Target shuffling minimal Balanced accuracy: 0.25; maximal balanced accuracy: 0.80
+  Z-score (How many sigmas is our model away from noise mean?): 1.58 (FAIL)
+
+6. Training KNN...
+   Running Target Shuffling (Validation) for KNN (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_KNN_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_KNN_fine-tuned_model.pkl
+ Train Accuracy: 0.839
+ Train Balanced Acc:  0.843
+ Train F1-score:   0.833
+------------------------------
+ Test Accuracy: 0.545
+ Test Balanced Acc:   0.589
+ Test F1-score:  0.545
+ CV Accuracy:    0.805 ± 0.103
+ CV Balanced Acc:     0.810 ± 0.107
+   Null Balanced Accuracy:  0.51 ± 0.12 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.73 (To beat 95% of random models)
+   Status:      Not Significant (p=2.87e-01)
+  Target shuffling minimal Balanced accuracy: 0.27; maximal balanced accuracy: 0.80
+  Z-score (How many sigmas is our model away from noise mean?): 0.64 (FAIL)
+
+7. Training SVC...
+   Running Target Shuffling (Validation) for SVC (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV fold metrics, target-shuffling outputs, and bootstrap probability outputs for RS42_preselected_n6_preselected_False_SVC_fine-tuned.
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n6_preselected_False_SVC_fine-tuned_model.pkl
+ Train Accuracy: 0.839
+ Train Balanced Acc:  0.843
+ Train F1-score:   0.833
+------------------------------
+ Test Accuracy: 0.545
+ Test Balanced Acc:   0.643
+ Test F1-score:  0.530
+ CV Accuracy:    0.839 ± 0.089
+ CV Balanced Acc:     0.839 ± 0.090
+   Null Balanced Accuracy:  0.50 ± 0.11 (Target Shuffling Baseline)
+   Threshold (95th %tile):  > 0.66 (To beat 95% of random models)
+   Status:      Borderline (Good signal, but high variance) (p=1.29e-01)
+  Target shuffling minimal Balanced accuracy: 0.29; maximal balanced accuracy: 0.73
+  Z-score (How many sigmas is our model away from noise mean?): 1.39 (FAIL)
+
+███████████████████████████████████████████████████████████████████████████
+█         STEP 6: RESULTS COMPILATION & ANALYSIS (CLASSIFICATION)         █
+███████████████████████████████████████████████████████████████████████████
+
+TOP 3 MODELS (Ranked by Test Balanced Accuracy):
+-----------------------------------------------------------------------------------------------
+Algorithm                 | Balanced Accuracy | Accuracy | p-value    | Status
+-----------------------------------------------------------------------------------------------
+GradientBoosting          | 0.804    | 0.82   | 3.0e-02  | High Significance
+XGBoost                   | 0.714    | 0.64   | 1.2e-01  | Not Significant
+DecisionTree              | 0.714    | 0.64   | 7.9e-02  | Not Significant
+
+BASELINE COMPARISON:
+----------------------------------------------------------------------
+Dummy Majority Acc: 0.64
+Best Model Acc:     0.82
+Improvement:        28.6%
+
+███████████████████████████████████████████████████████████████████████████
+            STEP 7: UNCERTAINTY QUANTIFICATION & AOA ANALYSIS            
+███████████████████████████████████████████████████████████████████████████
+
+Winning Algorithm: GradientBoosting
+----------------------------------------
+
+Bootstrap Uncertainty (95% CI on predicted probability of positive class):
+Sample probabilities for first 3 test samples:
+  Sample 1: True=1 | PredProb=0.882 (95% CI: 0.237-0.983, Width: 0.747)
+  Sample 2: True=1 | PredProb=0.585 (95% CI: 0.178-0.863, Width: 0.685)
+  Sample 3: True=1 | PredProb=0.430 (95% CI: 0.074-0.820, Width: 0.746)
+
+Area of Applicability (AOA) Status:
+  Interpolative (Reliable):  100.0% of test set
+  Extrapolative (Uncertain): 0.0% of test set
+  (See generated PDF file for visual plot)
+
+OK: Results exported to ../Results/QSPR_Classification_Preselected_20260825_122753.xlsx
+
+Saved → ../Results/QSPR_Classification_Preselected_20260825_122753.xlsx

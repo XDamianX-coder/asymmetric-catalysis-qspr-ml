@@ -1,0 +1,312 @@
+Console output saved to: ../Results/logs/QSPR_Analysis_20260825_100920.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+                    SINGLE RUN – PRE-SELECTED FEATURES (8)                    
+════════════════════════════════════════════════════════════════════════════════
+
+
+Loaded historical frozen pipelines; GridSearchCV was skipped.
+
+LOADED ATTRIBUTES:
+['backfill', 'current_method', 'current_mode', 'current_nfeatures', 'data_frame', 'descriptor_dir', 'hyperopt_results', 'include_chyline', 'include_circus', 'mode', 'name', 'random_state', 'results', 'target_col']
+
+fixed_models: NoneType
+
+models: NoneType
+
+loaded_models: NoneType
+
+frozen_models: NoneType
+
+hyperopt_results: dict with keys:
+['RandomForestRegressor', 'XGBoost', 'GradientBoosting', 'Ridge', 'DecisionTree', 'KNN', 'SVR']
+
+═══════════════════════════════════════════════════════════════════════════
+         ADVANCED QSPR ANALYSIS - COMPLETE PIPELINE (REGRESSION)         
+═══════════════════════════════════════════════════════════════════════════
+
+███████████████████████████████████████████████████████████████████████████
+              STEP 1: DATA LOADING & DESCRIPTOR CALCULATION              
+███████████████████████████████████████████████████████████████████████████
+
+Loading data from: ../Data/new_data_epoxidation.xlsx
+Including CircuS descriptors: True
+Including ChyLine descriptors: True
+
+===========================================================================
+LOADING DATA FOR UNIFIED DESCRIPTOR CALCULATION
+===========================================================================
+  DESCRIPTOR PIPELINE:
+ Mordred: True
+ Morgan FP: True
+ Sterimol + Electronic: True
+ ChemBERTa: False
+ CircuS: True
+ ChyLine: True
+
+---------------------------------------------------------------------------
+Calculating/Cleaning descriptors ...
+---------------------------------------------------------------------------
+SUCCESS: Loaded CLEANED descriptors from ..\Data\molecular_descriptors_cleaned_models_.parquet
+Shape: (41, 3970)
+Internal split: train=32, test=9
+Returning: train_df, test_df
+
+OK: Data loaded: 41 samples × 3970 features
+  Descriptor breakdown:
+    - Mordred: ~1600+ 2D/3D descriptors
+    - Morgan FP: 2048-bit (radius=2)
+    - Sterimol: L, B1, B5 parameters
+    - Electronic: Electronegativity, Partial Charges, Polarity Diffs
+    - ChemBERTa: 384-dim pretrained embeddings
+    - CircuS: Fragment-count descriptors
+    - ChyLine: Linear fragment-count descriptors
+
+ Target range: [0.0, 99.0]
+ Target std: 32.24
+ Target mean: 73.29
+
+███████████████████████████████████████████████████████████████████████████
+               PRESELECTED FEATURES MODE - SKIPPING STEP 2               
+███████████████████████████████████████████████████████████████████████████
+→ Using 8 pre-selected features (Step 2 skipped).
+  Reference frozen model: RandomForestRegressor
+  Manual order equals frozen order: False
+  Feature order: ['ATS5s', 'ATS3i', 'AMID_C', 'AATSC4i', 'nRot', 'Sterimol_Beta_R1_B5', 'ATSC7Z', 'GATS3d']
+  Training model matrix: (32, 8)
+  Test model matrix:     (9, 8)
+
+===========================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                   FEATURE CORRELATIONS WITH TARGET ee                   
+███████████████████████████████████████████████████████████████████████████
+
+Analysis on: TRAINING DATASET (32 structures)
+Method: Pearson correlation coefficient
+
+Feature                                   Correlation         p-value
+----------------------------------------------------------------------
+ATSC7Z                                        -0.4120        1.91e-02
+GATS3d                                        -0.3879        2.82e-02
+AATSC4i                                        0.3568        4.50e-02
+Sterimol_Beta_R1_B5                            0.3306        6.46e-02
+AMID_C                                         0.1869        3.06e-01
+ATS3i                                          0.1648        3.67e-01
+ATS5s                                         -0.1508        4.10e-01
+nRot                                          -0.0310        8.66e-01
+
+======================================================================
+Strong correlations (|r| > 0.5): 0
+Moderate correlations (0.3 < |r| ≤ 0.5): 4
+Weak correlations (0.1 < |r| ≤ 0.3): 3
+Negligible correlations (|r| ≤ 0.1): 1
+======================================================================
+→ Using 8 pre-selected features (Step 2 skipped).
+
+===========================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                   FEATURE CORRELATIONS WITH TARGET ee                   
+███████████████████████████████████████████████████████████████████████████
+
+Analysis on: TRAINING DATASET (32 structures)
+Method: Pearson correlation coefficient
+
+Feature                                   Correlation         p-value
+----------------------------------------------------------------------
+ATSC7Z                                        -0.4120        1.91e-02
+GATS3d                                        -0.3879        2.82e-02
+AATSC4i                                        0.3568        4.50e-02
+Sterimol_Beta_R1_B5                            0.3306        6.46e-02
+AMID_C                                         0.1869        3.06e-01
+ATS3i                                          0.1648        3.67e-01
+ATS5s                                         -0.1508        4.10e-01
+nRot                                          -0.0310        8.66e-01
+
+======================================================================
+Strong correlations (|r| > 0.5): 0
+Moderate correlations (0.3 < |r| ≤ 0.5): 4
+Weak correlations (0.1 < |r| ≤ 0.3): 3
+Negligible correlations (|r| ≤ 0.1): 1
+======================================================================
+
+███████████████████████████████████████████████████████████████████████████
+                    STEP 3: BASELINE MODEL COMPARISONS                   
+███████████████████████████████████████████████████████████████████████████
+
+[Data Saved] Training data -> ..\Results\Selected_Data\RS42_preselected_n8_preselected_False_train_data.parquet
+[Data Saved] Test data     -> ..\Results\Selected_Data\RS42_preselected_n8_preselected_False_test_data.parquet
+
+Using SELECTED FEATURES only:
+├─ Training set shape: (32, 3970)
+├─ Test set shape: (9, 3970)
+└─ Number of features: (32, 3970)
+
+Note: Features were selected from training data ONLY (Step 2)
+      Test data was NOT used for feature selection
+
+1. Dummy Mean Predictor (predicts training mean):
+   RMSE: 38.81
+   R²: -0.0858
+
+███████████████████████████████████████████████████████████████████████████
+                      STEP 5: TRAINING ML ALGORITHMS                     
+███████████████████████████████████████████████████████████████████████████
+
+[Pre-computation] Calculating Area of Applicability (AOA)...
+ High-res PDF saved as 'applicability_domain_highres_'preselected_COMMON_8_preselected_False'_.pdf'
+OK: AOA calculated and saved (will be reused for all models).
+
+1. Training RandomForestRegressor...
+   Running Target Shuffling (Validation) for RandomForestRegressor (preselected)...
+      PASS: Model significantly better than noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_RandomForestRegressor
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_RandomForestRegressor_model.pkl
+  Train RMSE: 17.28 (R²=0.66, Train MAE: 11.29)
+  Test RMSE:  24.41 (R²=0.57, Test MAE: 18.91)
+  CV RMSE:    23.57 ± 8.06
+  CV MAE:     16.27±4.74
+  RMSE/MAE ratio:     1.29
+  Null RMSE:  39.57 ± 3.35 (Target Shuffling Baseline)
+  Threshold:  < 32.87 (Required for True Significance)
+  Target shuffling minimal RMSE: 29.72; maximal RMSE: 47.23
+  Z-score (How many sigmas is our model away from noise mean?): 4.53 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+2. Training XGBoost...
+   Running Target Shuffling (Validation) for XGBoost (preselected)...
+      PASS: Model significantly better than noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_XGBoost
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_XGBoost_model.pkl
+  Train RMSE: 15.43 (R²=0.73, Train MAE: 10.26)
+  Test RMSE:  26.43 (R²=0.50, Test MAE: 20.15)
+  CV RMSE:    20.90 ± 10.67
+  CV MAE:     13.70±6.68
+  RMSE/MAE ratio:     1.31
+  Null RMSE:  39.23 ± 4.52 (Target Shuffling Baseline)
+  Threshold:  < 30.19 (Required for True Significance)
+  Target shuffling minimal RMSE: 29.35; maximal RMSE: 51.58
+  Z-score (How many sigmas is our model away from noise mean?): 2.83 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+3. Training GradientBoosting...
+   Running Target Shuffling (Validation) for GradientBoosting (preselected)...
+      PASS: Model significantly better than noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_GradientBoosting
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_GradientBoosting_model.pkl
+  Train RMSE: 14.75 (R²=0.75, Train MAE: 9.47)
+  Test RMSE:  23.67 (R²=0.60, Test MAE: 18.06)
+  CV RMSE:    21.71 ± 9.66
+  CV MAE:     14.91±5.72
+  RMSE/MAE ratio:     1.31
+  Null RMSE:  39.16 ± 4.72 (Target Shuffling Baseline)
+  Threshold:  < 29.72 (Required for True Significance)
+  Target shuffling minimal RMSE: 27.76; maximal RMSE: 52.80
+  Z-score (How many sigmas is our model away from noise mean?): 3.28 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=9.90e-03)
+
+4. Training Ridge...
+   Running Target Shuffling (Validation) for Ridge (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_Ridge
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_Ridge_model.pkl
+  Train RMSE: 23.17 (R²=0.39, Train MAE: 16.78)
+  Test RMSE:  37.48 (R²=-0.01, Test MAE: 27.74)
+  CV RMSE:    27.85 ± 9.31
+  CV MAE:     20.19±6.26
+  RMSE/MAE ratio:     1.35
+  Null RMSE:  40.32 ± 3.19 (Target Shuffling Baseline)
+  Threshold:  < 33.94 (Required for True Significance)
+  Target shuffling minimal RMSE: 34.34; maximal RMSE: 49.09
+  Z-score (How many sigmas is our model away from noise mean?): 0.89 (FAIL)
+  Status:      Not significant (p=2.38e-01)
+
+5. Training DecisionTree...
+   Running Target Shuffling (Validation) for DecisionTree (preselected)...
+      PASS: Model significantly better than noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_DecisionTree
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_DecisionTree_model.pkl
+  Train RMSE: 17.79 (R²=0.64, Train MAE: 9.28)
+  Test RMSE:  25.76 (R²=0.52, Test MAE: 20.56)
+  CV RMSE:    18.54 ± 10.41
+  CV MAE:     12.95±5.09
+  RMSE/MAE ratio:     1.25
+  Null RMSE:  44.64 ± 6.91 (Target Shuffling Baseline)
+  Threshold:  < 30.82 (Required for True Significance)
+  Target shuffling minimal RMSE: 21.30; maximal RMSE: 57.13
+  Z-score (How many sigmas is our model away from noise mean?): 2.73 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=1.98e-02)
+
+6. Training KNN...
+   Running Target Shuffling (Validation) for KNN (preselected)...
+      WARNING: Model indistinguishable from noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_KNN
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_KNN_model.pkl
+  Train RMSE: 20.43 (R²=0.53, Train MAE: 12.98)
+  Test RMSE:  44.50 (R²=-0.43, Test MAE: 31.07)
+  CV RMSE:    21.56 ± 10.06
+  CV MAE:     15.49±7.22
+  RMSE/MAE ratio:     1.43
+  Null RMSE:  40.72 ± 4.67 (Target Shuffling Baseline)
+  Threshold:  < 31.37 (Required for True Significance)
+  Target shuffling minimal RMSE: 27.71; maximal RMSE: 52.17
+  Z-score (How many sigmas is our model away from noise mean?): -0.81 (FAIL)
+  Status:      Not significant (p=8.12e-01)
+
+7. Training SVR...
+   Running Target Shuffling (Validation) for SVR (preselected)...
+      PASS: Model significantly better than noise.
+[Reviewer validation] Saved CV, target-shuffling, and bootstrap outputs for RS42_preselected_n8_preselected_False_SVR
+   [Model Saved] -> ..\Results\Trained_Models\RS42_preselected_n8_preselected_False_SVR_model.pkl
+  Train RMSE: 25.39 (R²=0.27, Train MAE: 15.00)
+  Test RMSE:  41.37 (R²=-0.23, Test MAE: 28.44)
+  CV RMSE:    27.87 ± 8.45
+  CV MAE:     18.32±4.33
+  RMSE/MAE ratio:     1.45
+  Null RMSE:  44.97 ± 1.77 (Target Shuffling Baseline)
+  Threshold:  < 41.42 (Required for True Significance)
+  Target shuffling minimal RMSE: 40.69; maximal RMSE: 49.51
+  Z-score (How many sigmas is our model away from noise mean?): 2.03 (PASS: >2σ)
+   Status:      TRULY SIGNIFICANT (p=3.96e-02)
+
+███████████████████████████████████████████████████████████████████████████
+                  STEP 6: RESULTS COMPILATION & ANALYSIS                 
+███████████████████████████████████████████████████████████████████████████
+
+TOP 3 MODELS (Ranked by Test RMSE):
+-----------------------------------------------------------------------------------------------
+Algorithm                 | RMSE     | R2     | p-value    | Status
+-----------------------------------------------------------------------------------------------
+GradientBoosting          | 23.674    | 0.60   | 9.9e-03  | High Significance
+RandomForestRegressor     | 24.408    | 0.57   | 9.9e-03  | High Significance
+DecisionTree              | 25.764    | 0.52   | 2.0e-02  | High Significance
+
+BASELINE COMPARISON:
+----------------------------------------------------------------------
+Dummy Mean RMSE:  38.81
+Best Model RMSE:  23.67
+Improvement:      39.0%
+
+███████████████████████████████████████████████████████████████████████████
+            STEP 7: UNCERTAINTY QUANTIFICATION & AOA ANALYSIS            
+███████████████████████████████████████████████████████████████████████████
+
+Winning Algorithm: GradientBoosting
+----------------------------------------
+
+Bootstrap Uncertainty (95% CI on Predictions):
+Sample predictions for first 3 test molecules:
+  Mol 1: True=0.0 | Pred=56.6 (95% CI: 28.5 - 87.3, Width: 58.8)
+  Mol 2: True=53.0 | Pred=62.6 (95% CI: 26.8 - 94.2, Width: 67.3)
+  Mol 3: True=95.0 | Pred=89.4 (95% CI: 74.6 - 95.3, Width: 20.7)
+
+Area of Applicability (AOA) Status:
+  Interpolative (Reliable):  66.7% of test set
+  Extrapolative (Uncertain): 33.3% of test set
+  (See generated PDF file for visual plot)
+
+OK: Results exported to ../Results/QSPR_Preselected_20260825_100920.xlsx
+
+Saved → ../Results/QSPR_Preselected_20260825_100920.xlsx
